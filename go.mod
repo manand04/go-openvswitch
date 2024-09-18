@@ -1,4 +1,4 @@
-module github.com/digitalocean/go-openvswitch
+module github.com/manand04/go-openvswitch
 
 go 1.16
 
