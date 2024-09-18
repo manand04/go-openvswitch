@@ -64,6 +64,8 @@ type Flow struct {
 	IdleTimeout int
 	Cookie      uint64
 	Actions     []Action
+	NPackets    int
+        NBytes      int
 }
 
 // A LearnedFlow is defined as part of the Learn action.
@@ -396,10 +398,33 @@ func (f *Flow) UnmarshalText(b []byte) error {
 			}
 			f.Table = int(table)
 			continue
-		case duration, nPackets, nBytes, hardAge, idleAge:
-			// ignore those fields.
-			continue
-		}
+		
+		case nPackets, nBytes :
+		    // Parse these fields into struct fields.
+	            switch strings.TrimSpace(kv[0]) {
+	            case nPackets:
+	                nPackets, err := strconv.ParseInt(kv[1], 10, 0)
+	                if err != nil {
+	                    return &FlowError{
+	                        Str: kv[1],
+	                        Err: err,
+	                    }
+	                }
+	                f.NPackets = int(nPackets)
+	            case nBytes:
+	                nBytes, err := strconv.ParseInt(kv[1], 10, 0)
+	                if err != nil {
+	                    return &FlowError{
+	                        Str: kv[1],
+	                        Err: err,
+	                    }
+	                }
+	                f.NBytes = int(nBytes)
+	            }
+	            continue
+	        }
+
+		
 
 		// All arbitrary key/value pairs that
 		// don't match the case above.
